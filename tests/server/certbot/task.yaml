@@ -1,0 +1,8 @@
+summary: ...
+prepare: |
+  snap install --classic certbot
+restore: |
+  snap remove --purge certbot
+execute: |
+  snap run certbot --help
+

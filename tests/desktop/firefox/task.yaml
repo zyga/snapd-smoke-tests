@@ -1,0 +1,8 @@
+summary: ...
+prepare: |
+  snap install firefox
+restore: |
+  snap remove --purge firefox
+execute: |
+  snap run firefox --help
+
