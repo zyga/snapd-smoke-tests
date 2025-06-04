@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+execute: |
+    snap run docker --help | MATCH 'A self-sufficient runtime for containers'
+prepare: |
+    snap-install docker
+restore: |
+    snap remove --purge docker
+summary: Install and see Docker help output.

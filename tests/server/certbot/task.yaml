@@ -1,8 +1,9 @@
-summary: ...
-prepare: |
-  snap install --classic certbot
-restore: |
-  snap remove --purge certbot
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
 execute: |
-  snap run certbot --help
-
+    snap run certbot --help | MATCH 'Certbot can obtain and install HTTPS/TLS/SSL certificates.'
+prepare: |
+    snap-install --classic certbot
+restore: |
+    snap remove --purge certbot
+summary: Install and see Certbot help output.

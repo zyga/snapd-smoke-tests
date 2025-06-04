@@ -1,1 +1,15 @@
-.image-garden
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+.image-garden/*.img
+.image-garden/*.iso
+.image-garden/*.lock
+.image-garden/*.log
+.image-garden/*.meta-data
+.image-garden/*.qcow2
+.image-garden/*.run
+.image-garden/*.user-data
+.image-garden/cache-*/snaps/*.assert
+.image-garden/cache-*/snaps/*.snap
+.spread-reuse.*.yaml
+.spread-reuse.yaml
+spread-logs/*.log

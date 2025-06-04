@@ -1,56 +1,102 @@
-project: snapd-smoke-tests
-path: /root/snapd-smoke-tests
-exclude:
-  - .image-garden
-  - .git
-prepare: |
-  # apt update
-  # apt dist-upgrade -y
-  echo nothing
-restore: |
-  echo nothing
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
 backends:
-  garden:
-    type: adhoc
-    allocate: |
-        if [ -n "${SPREAD_HOST_PATH-}" ]; then
-            PATH="$SPREAD_HOST_PATH"
-        fi
-        mkdir -p .image-garden/cache/"$SPREAD_SYSTEM.$(uname -m)"
-        exec image-garden allocate \
-          "$SPREAD_SYSTEM"."$(uname -m)" \
-          -virtfs local,mount_tag=cache,id=cache,path=$(pwd)/.image-garden/cache/"$SPREAD_SYSTEM.$(uname -m)",security_model=mapped
-    discard: |
-        if [ -n "${SPREAD_HOST_PATH-}" ]; then
-            PATH="$SPREAD_HOST_PATH"
-        fi
-        export QEMU_MEM_OPTION='-m 1024'
-        exec image-garden discard "$SPREAD_SYSTEM_ADDRESS"
-    systems:
-      - ubuntu-cloud-24.04:
-          username: ubuntu
-          password: ubuntu
-      - debian-cloud-11:
-          username: debian
-          password: debian
-      - debian-cloud-12:
-          username: debian
-          password: debian
-      - centos-cloud-9:
-          username: fedora
-          password: fedora
-      - fedora-cloud-41:
-          username: fedora
-          password: fedora
-      - fedora-cloud-42:
-          username: fedora
-          password: fedora
-      - opensuse-cloud-tumbleweed:
-          username: opensuse
-          password: opensuse
+    garden:
+        allocate: exec ./spread/allocate.sh
+        discard: exec ./spread/discard.sh
+        systems:
+            - ubuntu-cloud-20.04:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - ubuntu-cloud-22.04:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - ubuntu-cloud-24.04:
+                password: root
+                username: root
+                workers: 2
+            - ubuntu-cloud-25.04:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - ubuntu-cloud-25.10:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - debian-cloud-11:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - debian-cloud-12:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - debian-cloud-sid:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - centos-cloud-9:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - centos-cloud-10:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - fedora-cloud-41:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - fedora-cloud-42:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - opensuse-cloud-tumbleweed:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - archlinux-cloud:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+            - amazonlinux-cloud-2023:
+                manual: true
+                password: root
+                username: root
+                workers: 2
+        type: adhoc
+debug: |
+    cat *.debug || true
+    snap list
+    snap changes
+environment:
+    PATH: /root/snapd-smoke-tests/bin:$PATH
+    X_SPREAD_CACHE_DIR: /mnt/cache
+    X_SPREAD_SNAP_CACHE_DIR: $X_SPREAD_CACHE_DIR/snaps
+exclude:
+    - .image-garden
+    - .git
+path: /root/snapd-smoke-tests
+prepare: exec ./spread/prepare.sh
+project: snapd-smoke-tests
+restore: exec ./spread/restore.sh
 suites:
-  tests/server/:
-    summary: ...
-  tests/desktop/:
-    summary: ...
-
+    tests/desktop/:
+        summary: Desktop test suite (alpha)
+    tests/server/:
+        summary: Server test suite (beta)

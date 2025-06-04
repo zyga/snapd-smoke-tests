@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+execute: |
+    snap run hello-world | MATCH 'Hello World'
+prepare: |
+    snap-install hello-world
+restore: |
+    snap remove --purge hello-world
+summary: Install and see "hello-world" help output.

@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+name: test-snapd-smoke
+summary: Test snap built in the smoke test suite
+description: |
+    This snap builds a basic C program from source.
+license: Apache-2.0
+version: "1.0.0"
+base: core24
+confinement: strict
+parts:
+    hello:
+        plugin: make
+        make-parameters:
+            - prefix=/usr
+        source: .
+apps:
+    test-snapd-smoke:
+        command: usr/bin/hello
