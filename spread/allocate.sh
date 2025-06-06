@@ -15,7 +15,7 @@ fi
 export QEMU_MEM_OPTION='-m 2048'
 
 # If we have virtiofsd available then use it to provide efficient cache for each virtual machine.
-if [ -x /usr/libexec/virtiofsd ]; then
+if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 	# Prepare the architecture-specific cache directory.
 	mkdir -p .image-garden/cache-"$ARCH"
 
