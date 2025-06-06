@@ -17,17 +17,23 @@ set -eu
 : "${X_SPREAD_SNAP_CACHE_DIR:=/mnt/cache/snaps}"
 
 if [ $# -ne 1 ] && [ $# -ne 2 ] && [ $# -ne 3 ]; then
-	echo "Usage: snap-install [--classic] SNAP [CHANNEL]" >&2
+	echo "Usage: snap-install [--classic|--devmode] SNAP [CHANNEL]" >&2
 	echo "Install a snap from the store using local cache."
 	exit 64 # EX_USAGE
 fi
 
-if [ "$1" = --classic ]; then
+classic=0
+devmode=0
+case "$1" in
+--classic)
 	classic=1
 	shift
-else
-	classic=0
-fi
+	;;
+--devmode)
+	devmode=1
+	shift
+	;;
+esac
 
 snap="$1"
 channel="${2-latest/stable}"
@@ -72,6 +78,11 @@ sudo snap ack "$snap"_"$revision".assert
 if [ $classic -eq 1 ]; then
 	sudo snap install --classic "$snap"_"$revision".snap
 else
-	sudo snap install "$snap"_"$revision".snap
+	if [ $devmode -eq 1 ]; then
+		sudo snap install --devmode "$snap"_"$revision".snap
+	else
+		sudo snap install "$snap"_"$revision".snap
+	fi
 fi
+
 sudo snap switch "$snap" --channel="$channel"
