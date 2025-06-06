@@ -200,3 +200,15 @@ jobs:
                 export X_SPREAD_LXD_CHANNEL="${{ inputs.lxd-channel || 'latest/stable' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
                 spread -v garden:${{ matrix.system }}:
+            - name: Show logs
+              if: failure()
+              run: |
+                for f in .image-garden/*.log; do
+                    echo "********************************"
+                    echo "$f"
+                    echo "********************************"
+                    echo
+                    cat "$f"
+                    echo
+                    echo
+                done
