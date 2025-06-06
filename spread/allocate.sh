@@ -23,8 +23,10 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 	# image-garden allocate auto-synchronizes on spread.yaml so there should be
 	# meaningful protection from clashes.
 	VIRTIOFSD_SOCK_PATH=/dev/null
+	N=
 	while test -e "$VIRTIOFSD_SOCK_PATH"; do
-		VIRTIOFSD_SOCK_PATH=/tmp/vhostqemu."$(shuf -i 1-9999 -n 1)".sock
+		N="$(shuf -i 1-9999 -n 1)"
+		VIRTIOFSD_SOCK_PATH=/tmp/vhostqemu."$N".sock
 	done
 
 	# Use virtiofsd to expose host file-system to the guest in a very efficient
@@ -36,7 +38,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 		--socket-path "$VIRTIOFSD_SOCK_PATH" \
 		--sandbox "$(if test -n "${SNAP-}"; then echo none; else echo namespace; fi)" \
 		--seccomp "$(if test -n "${SNAP-}"; then echo none; else echo kill; fi)" \
-		</dev/null >/dev/null 2>&1 &
+		</dev/null >/tmp/virtiofsd."$N".log 2>/tmp/virtiofsd."$N".err &
 	VIRTIOFSD_PID=$!
 
 	# Wait for virtiofsd to start.
@@ -46,6 +48,17 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 		fi
 		sleep 1
 	done
+
+	if [ ! -S "$VIRTIOFSD_SOCK_PATH" ]; then
+		if [ -f /tmp/virtiofsd."$N".log ]; then
+			cat /tmp/virtiofsd."$N".log
+		fi
+		if [ -f /tmp/virtiofsd."$N".err ]; then
+			cat /tmp/virtiofsd."$N".err >&2
+		fi
+		echo "<FATAL cannot find virtiofsd socket>"
+		exit 213
+	fi
 
 	# Remove the extra PID file (we save ours separately).
 	# Yes the PID file is just the socket path with the .pid extension.
