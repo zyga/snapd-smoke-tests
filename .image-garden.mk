@@ -13,7 +13,8 @@ define snapd_suspend_workaround
 - |
     # Work around a bug in snapd auto-suspend feature by making snapd wait for at least 15 minutes.
     mkdir -p /etc/systemd/system/snapd.service.d;
-    echo -e "[Service]\\nEnvironment=SNAPD_STANDBY_WAIT=15m" >/etc/systemd/system/snapd.service.d/standby.conf;
+    echo "[Service]" >/etc/systemd/system/snapd.service.d/standby.conf;
+    echo "Environment=SNAPD_STANDBY_WAIT=15m" >>/etc/systemd/system/snapd.service.d/standby.conf;
 endef
 
 define ARCHLINUX_CLOUD_INIT_USER_DATA_TEMPLATE
