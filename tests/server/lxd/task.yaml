@@ -5,7 +5,7 @@ execute: |
     snap run lxd.lxc launch ubuntu:24.04 u1
     snap run lxd.lxc exec u1 -- cat /etc/os-release | MATCH 'VERSION_ID="24.04"'
 prepare: |
-    snap-install lxd
+    snap-install lxd "${X_SPREAD_LXD_CHANNEL}"
     # LXD is not immediately ready to accept API requets.
     snap run lxd waitready
     # Initialize LXD storage and networking with default settings.
