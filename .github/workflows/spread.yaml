@@ -89,7 +89,7 @@ jobs:
                 export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-"$(uname -m)"/snaps
                 ./bin/snap-install snapd
                 ./bin/snap-install core24
-                ./bin/snap-install image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
+                ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
             - name: Use spread from image-garden snap
               run: sudo snap alias image-garden.spread spread
             - name: Restore mtime of .image-garden.mk
