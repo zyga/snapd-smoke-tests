@@ -70,7 +70,13 @@ cd "$X_SPREAD_SNAP_CACHE_DIR"
 
 if [ ! -f "$snap"_"$revision".snap ] || [ ! -f "$snap"_"$revision".assert ]; then
 	echo "Downloading snap $snap revision $revision"
-	snap download "$snap" --revision "$revision"
+	# Download in /var/tmp but then copy to the cache directory.
+	# Hopefully with many racing systems we don't clobber each other.
+	snap download --target-directory=/var/tmp "$snap" --revision "$revision"
+	install -v -m 644 -t "$X_SPREAD_SNAP_CACHE_DIR" /var/tmp/"$snap"_"$revision".assert
+	install -v -m 644 -t "$X_SPREAD_SNAP_CACHE_DIR" /var/tmp/"$snap"_"$revision".snap
+	rm -v -f /var/tmp/"$snap"_"$revision".assert
+	rm -v -f /var/tmp/"$snap"_"$revision".snap
 fi
 
 echo "Installing snap $snap at revision $revision as if it came from channel $channel"
