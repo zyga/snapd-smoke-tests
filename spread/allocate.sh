@@ -43,7 +43,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 
 	# Wait for virtiofsd to start.
 	for _ in $(seq 5); do
-		if [ -e /tmp/vhostqemu."$SPREAD_SYSTEM"."$ARCH".sock ]; then
+		if [ -S "$VIRTIOFSD_SOCK_PATH" ]; then
 			break
 		fi
 		sleep 1
