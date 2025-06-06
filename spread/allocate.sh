@@ -23,8 +23,10 @@ if [ -x /usr/libexec/virtiofsd ]; then
 	# image-garden allocate auto-synchronizes on spread.yaml so there should be
 	# meaningful protection from clashes.
 	VIRTIOFSD_SOCK_PATH=/dev/null
+	N=
 	while test -e "$VIRTIOFSD_SOCK_PATH"; do
-		VIRTIOFSD_SOCK_PATH=/tmp/vhostqemu."$(shuf -i 1-9999 -n 1)".sock
+		N="$(shuf -i 1-9999 -n 1)"
+		VIRTIOFSD_SOCK_PATH=/tmp/vhostqemu."$N".sock
 	done
 
 	# Use virtiofsd to expose host file-system to the guest in a very efficient
@@ -41,7 +43,7 @@ if [ -x /usr/libexec/virtiofsd ]; then
 
 	# Wait for virtiofsd to start.
 	for _ in $(seq 5); do
-		if [ -e /tmp/vhostqemu."$SPREAD_SYSTEM"."$ARCH".sock ]; then
+		if [ -S "$VIRTIOFSD_SOCK_PATH" ]; then
 			break
 		fi
 		sleep 1
@@ -51,19 +53,23 @@ if [ -x /usr/libexec/virtiofsd ]; then
 	# Yes the PID file is just the socket path with the .pid extension.
 	rm -f "$VIRTIOFSD_SOCK_PATH".pid
 
+	SHM_PATH=/dev/shm"$(if test -n "${SNAP-}"; then echo /snap."${SNAP_INSTANCE_NAME}"; fi)".spread-cache."$N"
+
 	# Allocate the system through image-garden allocator.
 	if ADDR="$(image-garden allocate \
 		"$SPREAD_SYSTEM"."$ARCH" \
 		-chardev socket,id=char0,path="$VIRTIOFSD_SOCK_PATH" \
 		-device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=spread-cache \
-		-object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm"$(if test -n "${SNAP-}"; then echo /snap."${SNAP_INSTANCE_NAME}".; fi)",share=on \
+		-object memory-backend-file,id=mem,size=1G,mem-path="$SHM_PATH",share=on \
 		-numa node,memdev=mem)"; then
 		# Save the PID so that we can kill the poor-man's-service later.
 		echo "$VIRTIOFSD_PID" >/tmp/vhostqemu."$ADDR".pid
+		rm -f "$SHM_PATH"
 		echo "<ADDRESS $ADDR>"
 		exit 0
 	else
 		kill %1 || true
+		rm -f "$SHM_PATH"
 		echo "<FATAL cannot start>"
 		exit 213
 	fi
