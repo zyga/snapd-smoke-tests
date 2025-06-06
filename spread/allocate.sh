@@ -77,6 +77,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 		exit 0
 	else
 		kill %1 || true
+		tail -n 1 .image-garden/"$SPREAD_SYSTEM"."$ARCH".stderr.log
 		echo "<FATAL cannot start>"
 		exit 213
 	fi
