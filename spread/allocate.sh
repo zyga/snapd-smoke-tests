@@ -64,10 +64,12 @@ if [ -x /usr/libexec/virtiofsd ]; then
 		-numa node,memdev=mem)"; then
 		# Save the PID so that we can kill the poor-man's-service later.
 		echo "$VIRTIOFSD_PID" >/tmp/vhostqemu."$ADDR".pid
+		rm -f "$SHM_PATH"
 		echo "<ADDRESS $ADDR>"
 		exit 0
 	else
 		kill %1 || true
+		rm -f "$SHM_PATH"
 		echo "<FATAL cannot start>"
 		exit 213
 	fi
