@@ -119,6 +119,13 @@ $(BASE_CLOUD_INIT_USER_DATA_TEMPLATE)
 $(snapd_suspend_workaround)
 # https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker
 - echo net.ipv4.conf.all.forwarding=1 >/etc/sysctl.d/99-forwarding.conf
+# Remove the LXD snap that is sometimes pre-installed.
+# We want to make sure that we can remove all the base
+# snaps at the end of testing.
+- |
+    if snap list lxd | grep -q lxd; then
+        snap remove --purge lxd
+    fi
 packages:
 - curl
 - jq

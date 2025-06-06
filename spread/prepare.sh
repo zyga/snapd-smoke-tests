@@ -41,13 +41,6 @@ snap-install snapd "${X_SPREAD_SNAPD_CHANNEL}"
 # Show the version of snapd-as-a-snap packaged snapd.
 snap version | tee snap-version.snap.debug
 
-# Remove the LXD snap that is sometimes pre-installed.
-# We want to make sure that we can remove all the base
-# snaps at the end of testing.
-if snap list lxd | grep -q lxd; then
-	snap remove --purge lxd
-fi
-
 # Pre-install all the base snaps.
 for snap in bare core core18 core20 core22 core24; do
 	snap-install "$snap"
