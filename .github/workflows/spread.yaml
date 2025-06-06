@@ -98,7 +98,7 @@ jobs:
                 echo "set man-db/auto-update false" | sudo debconf-communicate
                 sudo dpkg-reconfigure man-db
                 # Download the deb and install it by hand.
-                wget http://launchpadlibrarian.net/643625039/git-restore-mtime_2022.12-1_all.deb
+                wget http://ftp.us.debian.org/debian/pool/main/g/git-mestrelion-tools/git-restore-mtime_2022.12-1_all.deb
                 sudo dpkg -i git-restore-mtime_2022.12-1_all.deb
                 rm -f git-restore-mtime_2022.12-1_all.deb
                 # sudo apt update
