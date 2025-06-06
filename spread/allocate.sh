@@ -50,6 +50,7 @@ if [ -x /usr/libexec/virtiofsd ]; then
 	done
 
 	if [ ! -S "$VIRTIOFSD_SOCK_PATH" ]; then
+		rm -f "$SHM_PATH"
 		echo "<FATAL cannot find virtiofsd socket: $(tail -n 1 .image-garden/virtiofsd."$N".err.log)>"
 		exit 213
 	fi
