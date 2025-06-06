@@ -124,8 +124,15 @@ $(snapd_suspend_workaround)
 # We want to make sure that we can remove all the base
 # snaps at the end of testing.
 - |
+    snap wait system seed.loaded
     if snap list lxd | grep -q lxd; then
         snap remove --purge lxd
+    fi
+    if snap list core20 | grep -q core20; then
+        snap remove --purge core20
+    fi
+    if snap list snapd | grep -q snapd; then
+        snap remove --purge snapd
     fi
 packages:
 - curl

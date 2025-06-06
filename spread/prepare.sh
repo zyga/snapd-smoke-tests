@@ -16,6 +16,11 @@ snap version | tee snap-version.distro.debug
 # Show the list of pre-installed snaps.
 snap list | tee snap-list-preinstalled.debug
 
+# We don't expect any snaps. This will change once we start testing with
+# desktop images. Currently we remove pre-installed snaps that some Ubuntu
+# releases ship. This includes snapd snap.
+snap list 2>&1 | grep -q 'No snaps are installed yet'
+
 # Show network config.
 ip addr list | tee ip-addr-list.debug
 
