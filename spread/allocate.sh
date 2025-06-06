@@ -12,7 +12,7 @@ fi
 
 # Give each virtual machine two gigabytes of RAM.
 # Note that this is in sync with the "-object memory-backend" entry below.
-export QEMU_MEM_OPTION='-m 2048'
+export QEMU_MEM_OPTION='-m 1024'
 
 # If we have virtiofsd available then use it to provide efficient cache for each virtual machine.
 if [ -x /usr/libexec/virtiofsd ]; then
@@ -56,7 +56,7 @@ if [ -x /usr/libexec/virtiofsd ]; then
 		"$SPREAD_SYSTEM"."$ARCH" \
 		-chardev socket,id=char0,path="$VIRTIOFSD_SOCK_PATH" \
 		-device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=spread-cache \
-		-object memory-backend-file,id=mem,size=2G,mem-path=/dev/shm"$(if test -n "${SNAP-}"; then echo /snap."${SNAP_INSTANCE_NAME}".; fi)",share=on \
+		-object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm"$(if test -n "${SNAP-}"; then echo /snap."${SNAP_INSTANCE_NAME}".; fi)",share=on \
 		-numa node,memdev=mem)"; then
 		# Save the PID so that we can kill the poor-man's-service later.
 		echo "$VIRTIOFSD_PID" >/tmp/vhostqemu."$ADDR".pid
