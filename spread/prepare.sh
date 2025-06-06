@@ -36,7 +36,7 @@ fi
 
 # Pre-install snapd as a snap. Use the latest/beta channel
 # to always test upcoming updates.
-snap-install snapd latest/beta
+snap-install snapd "${X_SPREAD_SNAPD_CHANNEL}"
 
 # Show the version of snapd-as-a-snap packaged snapd.
 snap version | tee snap-version.snap.debug

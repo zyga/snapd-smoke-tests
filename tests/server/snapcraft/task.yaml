@@ -18,7 +18,7 @@ debug: |
     fi
     cat ~/.local/state/snapcraft/log/snapcraft-*.log || true
 prepare: |
-    snap-install lxd
+    snap-install lxd "${X_SPREAD_LXD_CHANNEL}"
     # LXD is not immediately ready to accept API requets.
     snap run lxd waitready
     # Initialize LXD storage and networking with default settings.
@@ -48,7 +48,7 @@ prepare: |
         ip6tables -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
     fi
     # Install snapcraft for building a snap.
-    snap-install --classic snapcraft
+    snap-install --classic snapcraft "${X_SPREAD_SNAPCRAFT_CHANNEL}"
 restore: |
     snap remove --purge test-snapd-smoke || true
     snap remove --purge snapcraft
