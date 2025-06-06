@@ -38,7 +38,7 @@ if [ -x /usr/libexec/virtiofsd ]; then
 		--socket-path "$VIRTIOFSD_SOCK_PATH" \
 		--sandbox "$(if test -n "${SNAP-}"; then echo none; else echo namespace; fi)" \
 		--seccomp "$(if test -n "${SNAP-}"; then echo none; else echo kill; fi)" \
-		</dev/null >/dev/null 2>&1 &
+		</dev/null >.image-garden/virtiofsd."$N".log 2>.image-garden/virtiofsd."$N".err.log &
 	VIRTIOFSD_PID=$!
 
 	# Wait for virtiofsd to start.
@@ -48,6 +48,11 @@ if [ -x /usr/libexec/virtiofsd ]; then
 		fi
 		sleep 1
 	done
+
+	if [ ! -S "$VIRTIOFSD_SOCK_PATH" ]; then
+		echo "<FATAL cannot find virtiofsd socket: $(tail -n 1 .image-garden/virtiofsd."$N".err.log)>"
+		exit 213
+	fi
 
 	# Remove the extra PID file (we save ours separately).
 	# Yes the PID file is just the socket path with the .pid extension.
@@ -70,7 +75,8 @@ if [ -x /usr/libexec/virtiofsd ]; then
 	else
 		kill %1 || true
 		rm -f "$SHM_PATH"
-		echo "<FATAL cannot start>"
+		# XXX: We don't know which port "image-garden allocate" picked so use * here.
+		echo "<FATAL cannot start qemu: $(tail -n 1 .image-garden/"$SPREAD_SYSTEM"."$ARCH".*.stderr.log)>"
 		exit 213
 	fi
 else
