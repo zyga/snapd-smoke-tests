@@ -103,9 +103,11 @@ jobs:
               run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Run integration tests
               run: |
+                # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_CHANNEL="${{ inputs.lxd-channel || 'latest/stable' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
             - name: Show snap cache (after testing)
               if: always()
@@ -217,9 +219,11 @@ jobs:
               run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Run integration tests
               run: |
+                # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_CHANNEL="${{ inputs.lxd-channel || 'latest/stable' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
             - name: Show snap cache (after testing)
               if: always()
