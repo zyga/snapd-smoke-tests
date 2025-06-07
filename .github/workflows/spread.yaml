@@ -91,6 +91,7 @@ jobs:
                 git restore-mtime .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
+                mkdir -p ~/snap/image-garden/common/cache/dl
                 ls -lR ~/snap/image-garden/common/cache/dl
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
@@ -204,6 +205,7 @@ jobs:
                 git restore-mtime .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
+                mkdir -p ~/snap/image-garden/common/cache/dl
                 ls -lR ~/snap/image-garden/common/cache/dl
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ${{ matrix.system }}."$(uname -m)".qcow2
