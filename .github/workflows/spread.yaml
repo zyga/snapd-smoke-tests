@@ -33,6 +33,7 @@ jobs:
         steps:
             - name: Inspect the system
               run: |
+                set -x
                 uname -a
                 free -m
                 nproc
@@ -142,6 +143,7 @@ jobs:
         steps:
             - name: Inspect the system
               run: |
+                set -x
                 uname -a
                 free -m
                 nproc
