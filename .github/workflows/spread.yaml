@@ -33,6 +33,7 @@ jobs:
         steps:
             - name: Inspect the system
               run: |
+                set -x
                 uname -a
                 free -m
                 nproc
@@ -62,7 +63,10 @@ jobs:
             - name: Work around a bug in snapd suspend logic
               run: |
                 sudo mkdir -p /etc/systemd/system/snapd.service.d
-                echo -e "[Service]\\nEnvironment=SNAPD_STANDBY_WAIT=15m" | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
+                (
+                  echo "[Service]"
+                  echo "Environment=SNAPD_STANDBY_WAIT=15m"
+                ) | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
                 sudo systemctl daemon-reload
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
@@ -87,17 +91,27 @@ jobs:
                 git restore-mtime .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
+                mkdir -p ~/snap/image-garden/common/cache/dl
                 ls -lR ~/snap/image-garden/common/cache/dl
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
             - name: Make the virtual machine image
               run: image-garden make ubuntu-cloud-24.04."$(uname -m)".qcow2 ubuntu-cloud-24.04."$(uname -m)".run ubuntu-cloud-24.04.user-data ubuntu-cloud-24.04.meta-data ubuntu-cloud-24.04.seed.iso
+            - name: Ensure snap cache exists
+              run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
+            - name: Show snap cache (before testing)
+              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Run integration tests
               run: |
+                # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_CHANNEL="${{ inputs.lxd-channel || 'latest/stable' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
+            - name: Show snap cache (after testing)
+              if: always()
+              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Show logs
               if: failure()
               run: |
@@ -135,6 +149,7 @@ jobs:
         steps:
             - name: Inspect the system
               run: |
+                set -x
                 uname -a
                 free -m
                 nproc
@@ -192,17 +207,27 @@ jobs:
                 git restore-mtime .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
+                mkdir -p ~/snap/image-garden/common/cache/dl
                 ls -lR ~/snap/image-garden/common/cache/dl
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ${{ matrix.system }}."$(uname -m)".qcow2
             - name: Make the virtual machine image
               run: image-garden make ${{ matrix.system }}."$(uname -m)".qcow2 ${{ matrix.system }}."$(uname -m)".run ${{ matrix.system }}.user-data ${{ matrix.system }}.meta-data ${{ matrix.system }}.seed.iso
+            - name: Ensure snap cache exists
+              run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
+            - name: Show snap cache (before testing)
+              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Run integration tests
               run: |
+                # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_CHANNEL="${{ inputs.lxd-channel || 'latest/stable' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
+            - name: Show snap cache (after testing)
+              if: always()
+              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
             - name: Show logs
               if: failure()
               run: |
