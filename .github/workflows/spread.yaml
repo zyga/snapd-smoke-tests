@@ -63,7 +63,10 @@ jobs:
             - name: Work around a bug in snapd suspend logic
               run: |
                 sudo mkdir -p /etc/systemd/system/snapd.service.d
-                echo -e "[Service]\\nEnvironment=SNAPD_STANDBY_WAIT=15m" | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
+                (
+                  echo "[Service]"
+                  echo "Environment=SNAPD_STANDBY_WAIT=15m"
+                ) | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
                 sudo systemctl daemon-reload
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
