@@ -54,6 +54,7 @@ jobs:
                 path: ~/snap/image-garden/common/cache/dl
                 key: image-garden-dl-ubuntu-cloud-24.04
             - name: Cache customized virtual machine images
+              id: cache-image
               uses: actions/cache@v4
               with:
                 path: .image-garden
@@ -90,12 +91,14 @@ jobs:
                 # sudo apt install -y git-restore-mtime
                 git restore-mtime .image-garden.mk
             - name: Make the virtual machine image (dry run)
+              if: steps.cache-image.outputs.cache-hit == 'true'
               run: |
                 mkdir -p ~/snap/image-garden/common/cache/dl
                 ls -lR ~/snap/image-garden/common/cache/dl
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
             - name: Make the virtual machine image
+              if: steps.cache-image.outputs.cache-hit != 'true'
               run: image-garden make ubuntu-cloud-24.04."$(uname -m)".qcow2 ubuntu-cloud-24.04."$(uname -m)".run ubuntu-cloud-24.04.user-data ubuntu-cloud-24.04.meta-data ubuntu-cloud-24.04.seed.iso
             - name: Ensure snap cache exists
               run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
