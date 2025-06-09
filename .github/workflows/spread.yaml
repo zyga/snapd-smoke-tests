@@ -169,7 +169,8 @@ jobs:
               with:
                 path: ~/snap/image-garden/common/cache/dl
                 key: image-garden-dl-${{ matrix.system }}
-            - name: Cache customized virtual machine images
+            - name: Cache of customized virtual machine images
+              if: ${{ matrix.system == 'archlinux-cloud' }}
               uses: actions/cache@v4
               with:
                 path: .image-garden
