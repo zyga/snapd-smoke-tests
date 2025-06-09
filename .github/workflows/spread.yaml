@@ -46,11 +46,6 @@ jobs:
               # This is essential for git restore-mtime to work correctly.
               with:
                 fetch-depth: 0
-            - name: Cache downloaded snaps
-              uses: actions/cache@v4
-              with:
-                path: .image-garden/cache-*/snaps
-                key: snaps
             - name: Cache downloaded virtual machine images
               uses: actions/cache@v4
               with:
@@ -61,6 +56,11 @@ jobs:
               with:
                 path: .image-garden
                 key: image-garden-img-ubuntu-cloud-24.04-${{ hashFiles('.image-garden.mk') }}
+            - name: Cache downloaded snaps (host only)
+              uses: actions/cache@v4
+              with:
+                path: .image-garden/cache-host/snaps
+                key: host-snaps
             - name: Make permissions on /dev/kvm more lax
               run: sudo chmod -v 666 /dev/kvm
             - name: Work around a bug in snapd suspend logic
@@ -74,7 +74,7 @@ jobs:
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
               run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-"$(uname -m)"/snaps
+                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
                 ./bin/snap-install snapd
                 ./bin/snap-install core24
                 ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
@@ -101,6 +101,11 @@ jobs:
                 image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
             - name: Make the virtual machine image
               run: image-garden make ubuntu-cloud-24.04."$(uname -m)".qcow2 ubuntu-cloud-24.04."$(uname -m)".run ubuntu-cloud-24.04.user-data ubuntu-cloud-24.04.meta-data ubuntu-cloud-24.04.seed.iso
+            - name: Cache downloaded snaps
+              uses: actions/cache@v4
+              with:
+                path: .image-garden/cache-*/snaps
+                key: snaps
             - name: Ensure snap cache exists
               run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
             - name: Show snap cache (before testing)
@@ -167,11 +172,6 @@ jobs:
               # This is essential for git restore-mtime to work correctly.
               with:
                 fetch-depth: 0
-            - name: Restore cache of downloaded snaps
-              uses: actions/cache/restore@v4
-              with:
-                path: .image-garden/cache-*/snaps
-                key: snaps
             - name: Cache downloaded virtual machine images
               uses: actions/cache@v4
               with:
@@ -183,6 +183,11 @@ jobs:
               with:
                 path: .image-garden
                 key: image-garden-img-${{ matrix.system }}-${{ hashFiles('.image-garden.mk') }}
+            - name: Cache downloaded snaps (host only)
+              uses: actions/cache/restore@v4
+              with:
+                path: .image-garden/cache-host/snaps
+                key: host-snaps
             - name: Make permissions on /dev/kvm more lax
               run: sudo chmod -v 666 /dev/kvm
             - name: Work around a bug in snapd suspend logic
@@ -196,7 +201,7 @@ jobs:
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
               run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-"$(uname -m)"/snaps
+                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
                 ./bin/snap-install snapd
                 ./bin/snap-install core24
                 ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
@@ -223,6 +228,11 @@ jobs:
                 image-garden make --debug --dry-run ${{ matrix.system }}."$(uname -m)".qcow2
             - name: Make the virtual machine image
               run: image-garden make ${{ matrix.system }}."$(uname -m)".qcow2 ${{ matrix.system }}."$(uname -m)".run ${{ matrix.system }}.user-data ${{ matrix.system }}.meta-data ${{ matrix.system }}.seed.iso
+            - name: Restore cache of downloaded snaps
+              uses: actions/cache/restore@v4
+              with:
+                path: .image-garden/cache-*/snaps
+                key: snaps
             - name: Ensure snap cache exists
               run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
             - name: Show snap cache (before testing)
