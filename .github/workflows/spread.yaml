@@ -43,6 +43,9 @@ jobs:
                 ls -l /dev/kvm || true
             - name: Checkout code
               uses: actions/checkout@v4
+              # This is essential for git restore-mtime to work correctly.
+              with:
+                fetch-depth: 0
             - name: Cache downloaded snaps
               uses: actions/cache@v4
               with:
@@ -89,6 +92,7 @@ jobs:
                 # sudo apt update
                 # sudo apt install -y git-restore-mtime
                 git restore-mtime .image-garden.mk
+                ls -l .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
                 mkdir -p ~/snap/image-garden/common/cache/dl
@@ -159,6 +163,9 @@ jobs:
                 ls -l /dev/kvm || true
             - name: Checkout code
               uses: actions/checkout@v4
+              # This is essential for git restore-mtime to work correctly.
+              with:
+                fetch-depth: 0
             - name: Restore cache of downloaded snaps
               uses: actions/cache/restore@v4
               with:
@@ -205,6 +212,7 @@ jobs:
                 # sudo apt update
                 # sudo apt install -y git-restore-mtime
                 git restore-mtime .image-garden.mk
+                ls -l .image-garden.mk
             - name: Make the virtual machine image (dry run)
               run: |
                 mkdir -p ~/snap/image-garden/common/cache/dl
