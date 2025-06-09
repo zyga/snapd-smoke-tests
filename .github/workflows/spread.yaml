@@ -56,6 +56,11 @@ jobs:
               with:
                 path: .image-garden
                 key: image-garden-img-ubuntu-cloud-24.04-${{ hashFiles('.image-garden.mk') }}
+            - name: Cache downloaded snaps (host only)
+              uses: actions/cache@v4
+              with:
+                path: .image-garden/cache-host/snaps
+                key: host-snaps
             - name: Make permissions on /dev/kvm more lax
               run: sudo chmod -v 666 /dev/kvm
             - name: Work around a bug in snapd suspend logic
@@ -69,7 +74,7 @@ jobs:
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
               run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-"$(uname -m)"/snaps
+                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
                 ./bin/snap-install snapd
                 ./bin/snap-install core24
                 ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
@@ -178,6 +183,11 @@ jobs:
               with:
                 path: .image-garden
                 key: image-garden-img-${{ matrix.system }}-${{ hashFiles('.image-garden.mk') }}
+            - name: Cache downloaded snaps (host only)
+              uses: actions/cache/restore@v4
+              with:
+                path: .image-garden/cache-host/snaps
+                key: host-snaps
             - name: Make permissions on /dev/kvm more lax
               run: sudo chmod -v 666 /dev/kvm
             - name: Work around a bug in snapd suspend logic
@@ -191,7 +201,7 @@ jobs:
                 sudo systemctl restart snapd.service
             - name: Install image-garden snap
               run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-"$(uname -m)"/snaps
+                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
                 ./bin/snap-install snapd
                 ./bin/snap-install core24
                 ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
