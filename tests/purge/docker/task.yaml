@@ -1,0 +1,27 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+summary: See if snapd can be purged while Docker is used.
+details: |
+    The Docker snap is one of the most complex snaps known to exist, largely
+    due to the fact that it is privileged and can break out of the sandbox to
+    perform many of the more advanced functions. Removing Docker correctly is
+    tricky, especially when snapd itself is being removed and all we have is
+    the distribution maintainer script.
+prepare: |
+    snap-install docker latest/"$X_SPREAD_DOCKER_RISK_LEVEL"
+    # Give docker a moment to expose the API surface.
+    for _ in $(seq 5); do
+        if [ -S /var/run/docker.sock ]; then
+            break
+        fi
+        sleep 1
+    done
+    # Launch a container that runs in the background.
+    snap run docker run -v ./public_html:/usr/share/nginx/html:ro -d -p 8080:80 nginx
+    for _ in $(seq 5); do
+        if curl http://localhost:8080/index.txt | grep 'Hello World'; then
+            break
+        fi
+        sleep 1
+    done
+    curl http://localhost:8080/index.txt | MATCH 'Hello World'

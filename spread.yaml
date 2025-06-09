@@ -97,11 +97,21 @@ exclude:
     - .image-garden
     - .git
 path: /root/snapd-smoke-tests
-prepare: exec ./spread/prepare.sh
+prepare: exec "$SPREAD_PATH"/spread/prepare.sh
 project: snapd-smoke-tests
-restore: exec ./spread/restore.sh
+restore: exec "$SPREAD_PATH"/spread/restore.sh
 suites:
     tests/desktop/:
         summary: Desktop test suite (alpha)
     tests/server/:
         summary: Server test suite (beta)
+    tests/purge/:
+        systems:
+            # The following distributions do not have a maintenance script
+            # so removing snapd while snaps are installed, breaks things.
+            - -archlinux-cloud
+            - -opensuse-cloud-tumbleweed
+        summary: Classic packag purge tests (alpha)
+        prepare-each: exec "$SPREAD_PATH"/spread/purge-suite-prepare-each.sh
+        restore-each: exec "$SPREAD_PATH"/spread/purge-suite-restore-each.sh
+        restore: exec "$SPREAD_PATH"/spread/purge-suite-restore.sh

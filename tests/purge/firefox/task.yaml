@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+summary: See if snapd can be purged while Firefox is installed.
+details: |
+    The Firefox snap uses mount-control interface to establish a connection to
+    spell checker database offered by the host. As of snapd 2.70, this is not
+    tracked by very well and may leak after the snapd package is removed from
+    the system.
+prepare: |
+    snap-install gnome-42-2204
+    snap-install gtk-common-themes
+    snap-install firefox
+# TODO: I wonder if we can check that the mount-control mount point
+# is removed. This is a known issue in current snapd.

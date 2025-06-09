@@ -21,8 +21,8 @@ define ARCHLINUX_CLOUD_INIT_USER_DATA_TEMPLATE
 $(BASE_CLOUD_INIT_USER_DATA_TEMPLATE)
 $(snapd_suspend_workaround)
 # We cannot build the package as root so switch to the archlinux user.
-- sudo -u archlinux git clone https://aur.archlinux.org/snapd.git /tmp/snapd
-- cd /tmp/snapd && sudo -u archlinux makepkg -si --noconfirm
+- sudo -u archlinux git clone https://aur.archlinux.org/snapd.git /var/tmp/snapd
+- cd /var/tmp/snapd && sudo -u archlinux makepkg -si --noconfirm
 - systemctl enable --now snapd.socket
 - systemctl enable --now snapd.apparmor.service
 # https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker
@@ -108,8 +108,8 @@ $(snapd_suspend_workaround)
 - zypper --gpg-auto-import-keys refresh
 - zypper dup --from snappy
 - zypper install -y snapd
-- systemctl enable --now snapd
-- systemctl enable --now snapd.apparmor
+- systemctl enable --now snapd.socket
+- systemctl enable --now snapd.apparmor.service
 packages:
 - curl
 - jq
