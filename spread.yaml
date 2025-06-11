@@ -89,7 +89,7 @@ environment:
     X_SPREAD_CACHE_DIR: /mnt/cache
     X_SPREAD_SNAP_CACHE_DIR: $X_SPREAD_CACHE_DIR/snaps
     X_SPREAD_SNAPD_CHANNEL: '$(HOST: echo "${X_SPREAD_SNAPD_CHANNEL:-latest/beta}")'
-    X_SPREAD_LXD_CHANNEL: '$(HOST: echo "${X_SPREAD_LXD_CHANNEL:-latest/stable}")'
+    X_SPREAD_LXD_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_LXD_CHANNEL:-candidate}")'
     X_SPREAD_SNAPCRAFT_CHANNEL: '$(HOST: echo "${X_SPREAD_SNAPCRAFT_CHANNEL:-latest/stable}")'
 exclude:
     - .image-garden
