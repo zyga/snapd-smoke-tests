@@ -8,7 +8,7 @@ fi
 
 image-garden discard "$SPREAD_SYSTEM_ADDRESS"
 
-if [ -f /tmp/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid ]; then
-	kill "$(cat /tmp/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid)" || true
-	rm -f /tmp/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid
+if [ -f .image-garden/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid ]; then
+	kill "$(cat .image-garden/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid)" || true
+	rm -f .image-garden/vhostqemu."$SPREAD_SYSTEM_ADDRESS".pid
 fi

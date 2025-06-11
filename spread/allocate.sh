@@ -26,7 +26,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 	N=
 	while test -e "$VIRTIOFSD_SOCK_PATH"; do
 		N="$(shuf -i 1-9999 -n 1)"
-		VIRTIOFSD_SOCK_PATH=/tmp/vhostqemu."$N".sock
+		VIRTIOFSD_SOCK_PATH="$(pwd)"/.image-garden/vhostqemu."$N".sock
 	done
 
 	# Use virtiofsd to expose host file-system to the guest in a very efficient
@@ -69,7 +69,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 		-object memory-backend-file,id=mem,size=1G,mem-path="$SHM_PATH",share=on \
 		-numa node,memdev=mem)"; then
 		# Save the PID so that we can kill the poor-man's-service later.
-		echo "$VIRTIOFSD_PID" >/tmp/vhostqemu."$ADDR".pid
+		echo "$VIRTIOFSD_PID" >.image-garden/vhostqemu."$ADDR".pid
 		rm -f "$SHM_PATH"
 		echo "<ADDRESS $ADDR>"
 		exit 0
