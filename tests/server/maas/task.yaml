@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+environment:
+    MAAS_TRACK/3_6: "3.6"
+    MAAS_TRACK/3_5: "3.5"
+    MAAS_TRACK/3_4: "3.4"
+execute: |
+    snap run maas --help | MATCH 'usage: maas \[-h\] COMMAND \.\.\.'
+    # Initialize maas and connect it to the test database.
+    snap run maas init region+rack --database-uri maas-test-db:///  --maas-url http://localhost:5240/MAAS
+    snap run maas createadmin --username admin --password admin --email admin@example.com
+    # See if it is alive.
+    printf "Waiting for MAAS to be up and running.."
+    sleep 15
+    while true; do
+        status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5240/MAAS/api/2.0/describe/)
+        if [ "$status" -eq 200 ]; then
+            echo "Server is up! (HTTP 200)"
+            break
+        else
+            echo "Waiting... (HTTP $status)"
+            sleep 2
+        fi
+    done
+prepare: |
+    snap-install maas-test-db ${MAAS_TRACK}/"${X_SPREAD_MAAS_RISK_LEVEL}"
+    snap-install maas ${MAAS_TRACK}/"${X_SPREAD_MAAS_RISK_LEVEL}"
+restore: |
+    snap remove --purge maas
+    snap remove --purge maas-test-db
+summary: Install and see Metal-As-A-Service (MAAS) help output.

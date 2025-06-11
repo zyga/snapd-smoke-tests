@@ -17,6 +17,11 @@ on:
                 type: string
                 default: 'candidate'
                 required: true
+            maas-risk-level:
+                description: 'Store risk level of the maas snap'
+                type: string
+                default: 'candidate'
+                required: true
             snapcraft-channel:
                 description: 'Store channel of the snapcraft snap'
                 type: string
@@ -118,6 +123,7 @@ jobs:
                 # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
+                export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
                 # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
@@ -248,6 +254,7 @@ jobs:
                 # Export variables that spread picks up from the host.
                 export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
+                export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
                 # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
