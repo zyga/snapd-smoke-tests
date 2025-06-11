@@ -59,7 +59,7 @@ if [ -x "${SNAP-}"/usr/libexec/virtiofsd ]; then
 	# Yes the PID file is just the socket path with the .pid extension.
 	rm -f "$VIRTIOFSD_SOCK_PATH".pid
 
-	SHM_PATH=/dev/shm"$(if test -n "${SNAP-}"; then echo /snap."${SNAP_INSTANCE_NAME}"; fi)".spread-cache."$N"
+	SHM_PATH=/dev/shm/"$(if test -n "${SNAP-}"; then echo snap."${SNAP_INSTANCE_NAME}"; else echo virtiofsd; fi)".spread-cache."$N"
 
 	# Allocate the system through image-garden allocator.
 	if ADDR="$(image-garden allocate \
