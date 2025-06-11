@@ -62,7 +62,33 @@ fi
 
 mv "$snap".response "$snap".json
 
-revision="$(jq --raw-output ".result[0].channels[\"""$channel""\"].revision" "$snap".json)"
+revision=null
+while [ "$revision" = null ]; do
+	revision="$(jq --raw-output ".result[0].channels[\"""$channel""\"].revision" "$snap".json)"
+
+	if [ "$revision" = null ]; then
+		# Try the more stable risk level.
+		track=$(echo "$channel" | cut -d / -f 1)
+		risk=$(echo "$channel" | cut -d / -f 2)
+		case "$risk" in
+		edge)
+			risk=beta
+			;;
+		beta)
+			risk=candidate
+			;;
+		candidate)
+			risk=stable
+			;;
+		stable)
+			echo "Snap $snap has no open risk levels in track $track" >&2
+			exit 1
+			;;
+		esac
+		channel="$track/$risk"
+	fi
+done
+
 echo "Snap $snap in channel $channel is at revision $revision"
 
 mkdir -p "$X_SPREAD_SNAP_CACHE_DIR"
