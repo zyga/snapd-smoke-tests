@@ -19,12 +19,12 @@ on:
                 default: 'latest/beta'
                 required: true
             lxd-risk-level:
-                description: 'Store risk level of the lxd snap'
+                description: 'Store risk level of the LXD snap'
                 type: string
                 default: 'candidate'
                 required: true
             maas-risk-level:
-                description: 'Store risk level of the maas snap'
+                description: 'Store risk level of the MAAS snap'
                 type: string
                 default: 'candidate'
                 required: true
