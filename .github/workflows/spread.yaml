@@ -13,10 +13,10 @@ on:
             - 'tests/**'
     workflow_dispatch:
         inputs:
-            snapd-channel:
-                description: 'Store channel of the snapd snap'
+            snapd-risk-level:
+                description: 'Store risk level of the snapd snap'
                 type: string
-                default: 'latest/beta'
+                default: 'beta'
                 required: true
             lxd-risk-level:
                 description: 'Store risk level of the LXD snap'
@@ -133,7 +133,7 @@ jobs:
             - name: Run integration tests
               run: |
                 # Export variables that spread picks up from the host.
-                export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
+                export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
@@ -270,7 +270,7 @@ jobs:
             - name: Run integration tests
               run: |
                 # Export variables that spread picks up from the host.
-                export X_SPREAD_SNAPD_CHANEL="${{ inputs.snapd-channel || 'latest/beta' }}"
+                export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
