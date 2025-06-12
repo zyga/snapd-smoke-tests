@@ -5,6 +5,12 @@ on:
     push:
         branches: ["main"]
     pull_request:
+        paths:
+            - '.github/workflows/spread.yaml'
+            - 'bin/*'
+            - 'spread.yaml'
+            - 'spread/*.sh'
+            - 'tests/**'
     workflow_dispatch:
         inputs:
             snapd-channel:
