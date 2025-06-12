@@ -28,10 +28,10 @@ on:
                 type: string
                 default: 'candidate'
                 required: true
-            snapcraft-channel:
-                description: 'Store channel of the snapcraft snap'
+            snapcraft-risk-level:
+                description: 'Store risk level of the snapcraft snap'
                 type: string
-                default: 'latest/stable'
+                default: 'stable'
                 required: true
             image-garden-channel:
                 description: 'Store channel of the image-garden snap'
@@ -136,7 +136,7 @@ jobs:
                 export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
-                export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
             - name: Show snap cache (after testing)
@@ -273,7 +273,7 @@ jobs:
                 export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
-                export X_SPREAD_SNAPCRAFT_CHANEL="${{ inputs.snapcraft-channel || 'latest/stable' }}"
+                export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
             - name: Show snap cache (after testing)
