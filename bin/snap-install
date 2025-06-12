@@ -97,15 +97,22 @@ cd "$X_SPREAD_SNAP_CACHE_DIR"
 if [ ! -f "$snap"_"$revision".snap ] || [ ! -f "$snap"_"$revision".assert ]; then
 	echo "Downloading snap $snap revision $revision"
 	# Download in /var/tmp but then copy to the cache directory.
-	# Hopefully with many racing systems we don't clobber each other.
+	# Hopefully with many racing systems we don't clobber each other, but
+	# in order to reduce the risk of this, copy the file (via install), to
+	# a temporary name and then rename to the desired path.
 	snap download --target-directory=/var/tmp "$snap" --revision "$revision"
-	install -v -m 644 -t "$X_SPREAD_SNAP_CACHE_DIR" /var/tmp/"$snap"_"$revision".assert
-	install -v -m 644 -t "$X_SPREAD_SNAP_CACHE_DIR" /var/tmp/"$snap"_"$revision".snap
+	N="$(shuf -i 1-9999 -n 1)"
+	install -v -m 644 /var/tmp/"$snap"_"$revision".assert "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".assert."$N"
 	rm -v -f /var/tmp/"$snap"_"$revision".assert
+	install -v -m 644 /var/tmp/"$snap"_"$revision".snap "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".snap."$N"
 	rm -v -f /var/tmp/"$snap"_"$revision".snap
+	# We don't' want to clobber so whoever starts, wins.
+	mv --no-clobber "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".assert."$N" "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".assert || true
+	mv --no-clobber "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".snap."$N" "$X_SPREAD_SNAP_CACHE_DIR"/"$snap"_"$revision".snap || true
 fi
 
 echo "Installing snap $snap at revision $revision as if it came from channel $channel"
+ls -ld "$snap"_"$revision".assert "$snap"_"$revision".snap
 sudo snap ack "$snap"_"$revision".assert
 if [ $classic -eq 1 ]; then
 	sudo snap install --classic "$snap"_"$revision".snap
