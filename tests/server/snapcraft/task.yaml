@@ -53,7 +53,7 @@ prepare: |
         ip6tables -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
     fi
     # Install snapcraft for building a snap.
-    snap-install --classic snapcraft "${X_SPREAD_SNAPCRAFT_CHANNEL}"
+    snap-install --classic snapcraft latest/"${X_SPREAD_SNAPCRAFT_RISK_LEVEL}"
 restore: |
     snap remove --purge test-snapd-smoke || true
     snap remove --purge snapcraft
