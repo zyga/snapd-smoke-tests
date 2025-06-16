@@ -110,7 +110,13 @@ jobs:
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
             - name: Make the virtual machine image
-              run: image-garden make ubuntu-cloud-24.04."$(uname -m)".qcow2 ubuntu-cloud-24.04."$(uname -m)".run ubuntu-cloud-24.04.user-data ubuntu-cloud-24.04.meta-data ubuntu-cloud-24.04.seed.iso
+              run: |
+                image-garden make \
+                  ubuntu-cloud-24.04."$(uname -m)".qcow2 \
+                  ubuntu-cloud-24.04."$(uname -m)".run \
+                  ubuntu-cloud-24.04."$(uname -m)".user-data \
+                  ubuntu-cloud-24.04."$(uname -m)".meta-data \
+                  ubuntu-cloud-24.04."$(uname -m)".seed.iso
             - name: Rebase the virtual machine image
               run: |
                 # TODO: only run this if there was a cache hit.
@@ -241,7 +247,13 @@ jobs:
                 ls -lR .image-garden
                 image-garden make --debug --dry-run ${{ matrix.system }}."$(uname -m)".qcow2
             - name: Make the virtual machine image
-              run: image-garden make ${{ matrix.system }}."$(uname -m)".qcow2 ${{ matrix.system }}."$(uname -m)".run ${{ matrix.system }}.user-data ${{ matrix.system }}.meta-data ${{ matrix.system }}.seed.iso
+              run: |
+                image-garden make \
+                  ${{ matrix.system }}."$(uname -m)".qcow2 \
+                  ${{ matrix.system }}."$(uname -m)".run \
+                  ${{ matrix.system }}."$(uname -m)".user-data \
+                  ${{ matrix.system }}."$(uname -m)".meta-data \
+                  ${{ matrix.system }}."$(uname -m)".seed.iso
             - name: Rebase the virtual machine image
               run: |
                 # TODO: only run this if there was a cache hit.
