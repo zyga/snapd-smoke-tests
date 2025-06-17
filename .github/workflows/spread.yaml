@@ -40,7 +40,7 @@ on:
                 required: true
 jobs:
     canary:
-        runs-on: ubuntu-latest
+        runs-on: [self-hosted, linux, AMD64, X64, large, noble]
         steps:
             - name: Inspect the system
               run: |
@@ -155,7 +155,7 @@ jobs:
                     echo
                 done
     test:
-        runs-on: ubuntu-latest
+        runs-on: [self-hosted, linux, AMD64, X64, large, noble]
         needs: canary
         strategy:
             fail-fast: false
