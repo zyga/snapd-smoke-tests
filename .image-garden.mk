@@ -78,6 +78,7 @@ $(snapd_suspend_workaround)
 packages:
 - curl
 - jq
+- unzip
 # Ensure that snapd is installed.
 - snapd
 endef

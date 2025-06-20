@@ -13,6 +13,11 @@ on:
             - 'tests/**'
     workflow_dispatch:
         inputs:
+            salsa-job-id:
+                description: 'ID of the CI/CD the "build" job at https://salsa.debian.org/debian/snapd which contains Debian package to test'
+                type: string
+                default: ''
+                required: false
             snapd-risk-level:
                 description: 'Store risk level of the snapd snap'
                 type: string
@@ -142,6 +147,7 @@ jobs:
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
+                export X_SPREAD_SALSA_JOB_ID="${{ inputs.salsa-job-id || '' }}"
                 # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
             - name: Show snap cache (after testing)
@@ -280,6 +286,7 @@ jobs:
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
+                export X_SPREAD_SALSA_JOB_ID="${{ inputs.salsa-job-id || '' }}"
                 # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
             - name: Show snap cache (after testing)
