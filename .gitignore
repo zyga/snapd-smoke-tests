@@ -10,6 +10,7 @@
 .image-garden/*.user-data
 .image-garden/cache-*/snaps/*.assert
 .image-garden/cache-*/snaps/*.snap
+.image-garden/cache-*/snaps/
 .spread-reuse.*.yaml
 .spread-reuse.yaml
 spread-logs/*.log
