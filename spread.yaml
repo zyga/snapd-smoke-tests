@@ -92,6 +92,7 @@ environment:
     X_SPREAD_LXD_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_LXD_RISK_LEVEL:-candidate}")'
     X_SPREAD_MAAS_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_MAAS_RISK_LEVEL:-candidate}")'
     X_SPREAD_SNAPCRAFT_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_SNAPCRAFT_RISK_LEVEL:-stable}")'
+    X_SPREAD_DOCKER_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_DOCKER_RISK_LEVEL:-stable}")'
 exclude:
     - .image-garden
     - .git
