@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+name: bodhi
+on:
+    workflow_dispatch:
+        inputs:
+            bodhi-advisory-id:
+                description: 'ID of the Fedora update advisory to test'
+                type: choice
+                required: true
+                options:
+                    - fedora-cloud-41
+                    - fedora-cloud-42
+                    - centos-cloud-9
+                    - centos-cloud-10
+            garden-system:
+                description: 'System to test against (fedora-cloud-XX)'
+                type: string
+                required: true
+            snapd-risk-level:
+                description: 'Store risk level of the snapd snap'
+                type: string
+                default: 'beta'
+                required: true
+            lxd-risk-level:
+                description: 'Store risk level of the LXD snap'
+                type: string
+                default: 'candidate'
+                required: true
+            maas-risk-level:
+                description: 'Store risk level of the MAAS snap'
+                type: string
+                default: 'candidate'
+                required: true
+            snapcraft-risk-level:
+                description: 'Store risk level of the snapcraft snap'
+                type: string
+                default: 'stable'
+                required: true
+            docker-risk-level:
+                description: 'Store risk level of the docker snap'
+                type: string
+                default: stable
+            image-garden-channel:
+                description: 'Store channel of the image-garden snap'
+                type: string
+                default: 'latest/edge'
+                required: true
+jobs:
+    spread:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              # This is essential for git restore-mtime to work correctly.
+              with:
+                fetch-depth: 0
+            - name: Cache downloaded snaps
+              uses: actions/cache@v4
+              with:
+                path: .image-garden/cache-*/snaps
+                key: snaps
+            - name: Set environment variables for spread
+              run: |
+                # Export variables that spread picks up from the host.
+                echo X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}" >> $GITHUB_ENV
+                echo X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}" >> $GITHUB_ENV
+                echo X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}" >> $GITHUB_ENV
+                echo X_SPREAD_BODHI_ADVISORY_ID="${{ inputs.bodhi-advisory-id || '' }}" >> $GITHUB_ENV
+            - name: Run integration tests
+              uses: zyga/image-garden-action@85a3d79c9d1e1628d7b0bad081b3a3463c2819a3
+              with:
+                garden-system: ${{inputs.garden-system }}
+                image-garden-channel: ${{ inputs.image-garden-channel }}
