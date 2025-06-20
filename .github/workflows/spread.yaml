@@ -33,6 +33,10 @@ on:
                 type: string
                 default: 'stable'
                 required: true
+            docker-risk-level:
+                description: 'Store risk level of the docker snap'
+                type: string
+                default: stable
             image-garden-channel:
                 description: 'Store channel of the image-garden snap'
                 type: string
@@ -137,6 +141,7 @@ jobs:
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
+                export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
                 # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
             - name: Show snap cache (after testing)
@@ -274,6 +279,7 @@ jobs:
                 export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
                 export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
+                export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
                 # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
             - name: Show snap cache (after testing)
