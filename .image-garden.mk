@@ -35,7 +35,30 @@ packages:
 - git
 endef
 
-define AMAZONLINUX_CLOUD_INIT_USER_DATA_TEMPLATE
+define AMAZONLINUX_2_CLOUD_INIT_USER_DATA_TEMPLATE
+$(BASE_CLOUD_INIT_USER_DATA_TEMPLATE)
+$(snapd_suspend_workaround)
+# https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker
+- echo net.ipv4.conf.all.forwarding=1 >/etc/sysctl.d/99-forwarding.conf
+- systemctl enable --now snapd.socket
+# Amazon 2 does not implement the power_state cloud-init plugin.
+- shutdown --poweroff now
+packages:
+# Curl is pre-installed but only in the "minimal" version.
+# Installing curl via cloud-init fails as it conflicts with curl-minimal
+- jq
+# Ensure that snapd is installed.
+- snapd
+# Snapd is distributed via Maciej's quasi-official archive.
+yum_repos:
+  snapd:
+    name: snapd packages for Amazon Linux
+    baseurl: https://bboozzoo.github.io/snapd-amazon-linux/amzn2/$$basearch
+    gpgcheck: false
+    enabled: true
+endef
+
+define AMAZONLINUX_2023_CLOUD_INIT_USER_DATA_TEMPLATE
 $(BASE_CLOUD_INIT_USER_DATA_TEMPLATE)
 $(snapd_suspend_workaround)
 # https://documentation.ubuntu.com/lxd/latest/howto/network_bridge_firewalld/#prevent-connectivity-issues-with-lxd-and-docker

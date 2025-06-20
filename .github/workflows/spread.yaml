@@ -161,6 +161,7 @@ jobs:
             fail-fast: false
             matrix:
                 system:
+                    - amazonlinux-cloud-2
                     - amazonlinux-cloud-2023
                     - archlinux-cloud
                     - centos-cloud-10
