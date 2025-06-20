@@ -41,6 +41,15 @@ debian-cloud-sid)
 		snap version | tee snap-version.salsa.debug
 	fi
 	;;
+fedora-* | centos-*)
+	# If requested, download and install a custom build of snapd from the
+	# Fedora update system, Bodhi.
+	if [ -n "$X_SPREAD_BODHI_ADVISORY_ID" ]; then
+		dnf upgrade --refresh --advisory="$X_SPREAD_BODHI_ADVISORY_ID"
+		# Show the version of classically updated snapd.
+		snap version | tee snap-version.bodhi.debug
+	fi
+	;;
 esac
 
 # Show the list of pre-installed snaps.

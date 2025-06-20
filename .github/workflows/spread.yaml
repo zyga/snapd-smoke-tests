@@ -18,6 +18,11 @@ on:
                 type: string
                 default: ''
                 required: false
+            bodhi-advisory-id:
+                description: 'ID of the Fedora update advisory to test'
+                type: string
+                default: ''
+                required: false
             snapd-risk-level:
                 description: 'Store risk level of the snapd snap'
                 type: string
@@ -148,6 +153,7 @@ jobs:
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
                 export X_SPREAD_SALSA_JOB_ID="${{ inputs.salsa-job-id || '' }}"
+                export X_SPREAD_BODHI_ADVISORY_ID="${{ inputs.bodhi-advisory-id || '' }}"
                 # Run integration tests.
                 spread -v garden:ubuntu-cloud-24.04:
             - name: Show snap cache (after testing)
@@ -287,6 +293,7 @@ jobs:
                 export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
                 export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
                 export X_SPREAD_SALSA_JOB_ID="${{ inputs.salsa-job-id || '' }}"
+                export X_SPREAD_BODHI_ADVISORY_ID="${{ inputs.bodhi-advisory-id || '' }}"
                 # Run integration tests.
                 spread -v garden:${{ matrix.system }}:
             - name: Show snap cache (after testing)
