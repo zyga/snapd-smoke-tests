@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+summary: See if snapd can be purged while only base snaps are installed
+details: |
+    The restore-each step of this suite purges the snapd classic package.
+    In this test we do not install any difficult snaps, so only base snaps
+    and snapd itself is installed as a snap.
+execute: |
+    snap list | MATCH snapd
+    snap list | MATCH core
+    snap list | MATCH core18
+    snap list | MATCH core20
+    snap list | MATCH core22
+    snap list | MATCH core24
+    snap list | MATCH bare

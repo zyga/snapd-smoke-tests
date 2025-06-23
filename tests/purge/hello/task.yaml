@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Canonical Ltd.
+summary: See if snapd can be purged while hello snap is installed.
+details: |
+    The hello snap is extremely basic and removing it should be equally easy.
+    This test serves as the smoke test for the behavior of the snapd classic
+    package maintenance scripts.
+prepare: |
+    snap-install hello
