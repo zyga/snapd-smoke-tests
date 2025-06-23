@@ -115,6 +115,7 @@ jobs:
             - name: Run integration tests
               uses: zyga/image-garden-action@85a3d79c9d1e1628d7b0bad081b3a3463c2819a3
               with:
+                snapd-channel: latest/edge
                 image-garden-channel: ${{ inputs.image-garden-channel }}
                 garden-system: ${{ matrix.garden-system }}
                 cache-prepared-images: ${{ matrix.garden-system == 'archlinux-cloud' }}
