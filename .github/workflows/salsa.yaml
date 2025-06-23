@@ -65,4 +65,4 @@ jobs:
               with:
                 garden-system: debian-cloud-sid
                 snapd-channel: latest/edge
-                image-garden-channel: ${{ inputs.image-garden-channel }}
+                image-garden-channel: ${{ inputs.image-garden-channel || 'latest/edge' }}

@@ -69,7 +69,7 @@ jobs:
               with:
                 snapd-channel: latest/edge
                 garden-system: ubuntu-cloud-24.04
-                image-garden-channel: ${{ inputs.image-garden-channel }}
+                image-garden-channel: ${{ inputs.image-garden-channel || 'latest/edge' }}
     test:
         runs-on: ubuntu-latest
         needs: canary
@@ -117,6 +117,6 @@ jobs:
               uses: zyga/image-garden-action@v0
               with:
                 snapd-channel: latest/edge
-                image-garden-channel: ${{ inputs.image-garden-channel }}
+                image-garden-channel: ${{ inputs.image-garden-channel || 'latest/edge' }}
                 garden-system: ${{ matrix.garden-system }}
                 cache-prepared-images: ${{ matrix.garden-system == 'archlinux-cloud' }}

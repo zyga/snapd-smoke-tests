@@ -74,4 +74,4 @@ jobs:
               with:
                 garden-system: ${{inputs.garden-system }}
                 snapd-channel: latest/edge
-                image-garden-channel: ${{ inputs.image-garden-channel }}
+                image-garden-channel: ${{ inputs.image-garden-channel || 'latest/edge' }}
