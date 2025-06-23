@@ -40,3 +40,13 @@ https://salsa.debian.org/debian/snapd and either invoke the GitHub workflow
 `X_SPREAD_SALSA_JOB_ID=` environment variable set.
 
 Note that this is only compatible with `debian-cloud-sid` spread system.
+
+## Testing builds from https://bodhi.fedoraproject.org/
+
+Grab the advisory number from the Fedora update system (e.g.
+`FEDORA-2025-737127f363`) and either invoke the GitHub workflow passing the ID
+or run spread locally with `X_SPREAD_BODHI_ADVISORY_ID=` environment variable
+set.
+
+Note that the advisory is only compatible with a given release of Fedora or
+EPEL, so you must be careful in selecting the system to pair it with.
