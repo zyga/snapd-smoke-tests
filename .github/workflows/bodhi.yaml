@@ -6,6 +6,10 @@ on:
         inputs:
             bodhi-advisory-id:
                 description: 'ID of the Fedora update advisory to test'
+                type: string
+                required: true
+            garden-system:
+                description: 'System to test against'
                 type: choice
                 required: true
                 options:
@@ -13,10 +17,6 @@ on:
                     - fedora-cloud-42
                     - centos-cloud-9
                     - centos-cloud-10
-            garden-system:
-                description: 'System to test against (fedora-cloud-XX)'
-                type: string
-                required: true
             snapd-risk-level:
                 description: 'Store risk level of the snapd snap'
                 type: string
