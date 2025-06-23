@@ -32,7 +32,7 @@ To run tests locally install the `image-garden` snap and then run the
 you may need to use _edge_ channel for both snapd snap and image-garden until
 image-garden 0.4 and snapd 2.71 are released.
 
-## Testing builds from salsa.debian.org
+## Testing builds from https://salsa.debian.org/debian/snapd
 
 Grab the GitLab job ID for the "build" job of a pipeline that ran on
 https://salsa.debian.org/debian/snapd and either invoke the GitHub workflow
