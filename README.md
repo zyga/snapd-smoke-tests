@@ -31,3 +31,12 @@ To run tests locally install the `image-garden` snap and then run the
 `run-spread.sh` script from the root of the project. For optimal performance
 you may need to use _edge_ channel for both snapd snap and image-garden until
 image-garden 0.4 and snapd 2.71 are released.
+
+## Testing builds from salsa.debian.org
+
+Grab the GitLab job ID for the "build" job of a pipeline that ran on
+https://salsa.debian.org/debian/snapd and either invoke the GitHub workflow
+"salsa", passing to it the ID or run spread locally with
+`X_SPREAD_SALSA_JOB_ID=` environment variable set.
+
+Note that this is only compatible with `debian-cloud-sid` spread system.

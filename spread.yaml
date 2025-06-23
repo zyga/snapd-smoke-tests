@@ -98,6 +98,7 @@ environment:
     X_SPREAD_MAAS_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_MAAS_RISK_LEVEL:-candidate}")'
     X_SPREAD_SNAPCRAFT_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_SNAPCRAFT_RISK_LEVEL:-stable}")'
     X_SPREAD_DOCKER_RISK_LEVEL: '$(HOST: echo "${X_SPREAD_DOCKER_RISK_LEVEL:-stable}")'
+    X_SPREAD_SALSA_JOB_ID: '$(HOST: echo "${X_SPREAD_SALSA_JOB_ID:-}")'
 exclude:
     - .image-garden
     - .git
