@@ -67,6 +67,7 @@ jobs:
             - name: Run integration tests
               uses: zyga/image-garden-action@v0
               with:
+                snapd-channel: latest/edge
                 garden-system: ubuntu-cloud-24.04
                 image-garden-channel: ${{ inputs.image-garden-channel }}
     test:
