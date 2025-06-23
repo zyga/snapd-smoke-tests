@@ -46,126 +46,35 @@ jobs:
     canary:
         runs-on: ubuntu-latest
         steps:
-            - name: Inspect the system
-              run: |
-                set -x
-                uname -a
-                free -m
-                nproc
-                snap version
-                groups
-                ip addr list
-                ls -l /dev/kvm || true
             - name: Checkout code
               uses: actions/checkout@v4
               # This is essential for git restore-mtime to work correctly.
               with:
                 fetch-depth: 0
-            - name: Cache downloaded virtual machine images
-              uses: actions/cache@v4
-              with:
-                path: ~/snap/image-garden/common/cache/dl
-                key: image-garden-dl-ubuntu-cloud-24.04
-            - name: Cache customized virtual machine images
-              uses: actions/cache@v4
-              with:
-                path: .image-garden
-                key: image-garden-img-ubuntu-cloud-24.04-${{ hashFiles('.image-garden.mk') }}
-            - name: Cache downloaded snaps (host only)
-              uses: actions/cache@v4
-              with:
-                path: .image-garden/cache-host/snaps
-                key: host-snaps
-            - name: Make permissions on /dev/kvm more lax
-              run: sudo chmod -v 666 /dev/kvm
-            - name: Work around a bug in snapd suspend logic
-              run: |
-                sudo mkdir -p /etc/systemd/system/snapd.service.d
-                (
-                  echo "[Service]"
-                  echo "Environment=SNAPD_STANDBY_WAIT=15m"
-                ) | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
-                sudo systemctl daemon-reload
-                sudo systemctl restart snapd.service
-            - name: Install image-garden snap
-              run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
-                ./bin/snap-install snapd
-                ./bin/snap-install core24
-                ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
-            - name: Use spread from image-garden snap
-              run: sudo snap alias image-garden.spread spread
-            - name: Restore mtime of .image-garden.mk
-              run: |
-                # Disable man page updates which is time-consuming.
-                echo "man-db man-db/auto-update boolean false" | sudo debconf-set-selections
-                # Download the deb and install it by hand.
-                wget http://ftp.us.debian.org/debian/pool/main/g/git-mestrelion-tools/git-restore-mtime_2022.12-1_all.deb
-                sudo dpkg -i git-restore-mtime_2022.12-1_all.deb
-                rm -f git-restore-mtime_2022.12-1_all.deb
-                # sudo apt update
-                # sudo apt install -y git-restore-mtime
-                git restore-mtime .image-garden.mk
-                ls -l .image-garden.mk
-            - name: Make the virtual machine image (dry run)
-              run: |
-                mkdir -p ~/snap/image-garden/common/cache/dl
-                ls -lR ~/snap/image-garden/common/cache/dl
-                ls -lR .image-garden
-                image-garden make --debug --dry-run ubuntu-cloud-24.04."$(uname -m)".qcow2
-            - name: Make the virtual machine image
-              run: |
-                image-garden make \
-                  ubuntu-cloud-24.04."$(uname -m)".qcow2 \
-                  ubuntu-cloud-24.04."$(uname -m)".run \
-                  ubuntu-cloud-24.04."$(uname -m)".user-data \
-                  ubuntu-cloud-24.04."$(uname -m)".meta-data \
-                  ubuntu-cloud-24.04."$(uname -m)".seed.iso
-            - name: Rebase the virtual machine image
-              run: |
-                # TODO: only run this if there was a cache hit.
-                image-garden rebase ubuntu-cloud-24.04."$(uname -m)".qcow2
             - name: Cache downloaded snaps
               uses: actions/cache@v4
               with:
                 path: .image-garden/cache-*/snaps
                 key: snaps
-            - name: Ensure snap cache exists
-              run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
-            - name: Show snap cache (before testing)
-              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
-            - name: Run integration tests
+            - name: Set environment variables for spread
               run: |
                 # Export variables that spread picks up from the host.
-                export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
-                export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
-                export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
-                export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
-                export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
-                # Run integration tests.
-                spread -v garden:ubuntu-cloud-24.04:
-            - name: Show snap cache (after testing)
-              if: always()
-              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
-            - name: Show logs
-              if: failure()
-              run: |
-                for f in .image-garden/*.log; do
-                    echo "********************************"
-                    echo "$f"
-                    echo "********************************"
-                    echo
-                    cat "$f"
-                    echo
-                    echo
-                done
+                echo X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}" >> $GITHUB_ENV
+                echo X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}" >> $GITHUB_ENV
+                echo X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}" >> $GITHUB_ENV
+            - name: Run integration tests
+              uses: zyga/image-garden-action@85a3d79c9d1e1628d7b0bad081b3a3463c2819a3
+              with:
+                garden-system: ubuntu-cloud-24.04
     test:
         runs-on: ubuntu-latest
         needs: canary
         strategy:
             fail-fast: false
             matrix:
-                system:
+                garden-system:
                     - amazonlinux-cloud-2
                     - amazonlinux-cloud-2023
                     - archlinux-cloud
@@ -184,117 +93,26 @@ jobs:
                     - ubuntu-cloud-25.04
                     - ubuntu-cloud-25.10
         steps:
-            - name: Inspect the system
-              run: |
-                set -x
-                uname -a
-                free -m
-                nproc
-                snap version
-                groups
-                ip addr list
-                ls -l /dev/kvm || true
             - name: Checkout code
               uses: actions/checkout@v4
               # This is essential for git restore-mtime to work correctly.
               with:
                 fetch-depth: 0
-            - name: Cache downloaded virtual machine images
-              uses: actions/cache@v4
-              with:
-                path: ~/snap/image-garden/common/cache/dl
-                key: image-garden-dl-${{ matrix.system }}
-            - name: Cache of customized virtual machine images
-              if: ${{ matrix.system == 'archlinux-cloud' }}
-              uses: actions/cache@v4
-              with:
-                path: .image-garden
-                key: image-garden-img-${{ matrix.system }}-${{ hashFiles('.image-garden.mk') }}
-            - name: Cache downloaded snaps (host only)
-              uses: actions/cache/restore@v4
-              with:
-                path: .image-garden/cache-host/snaps
-                key: host-snaps
-            - name: Make permissions on /dev/kvm more lax
-              run: sudo chmod -v 666 /dev/kvm
-            - name: Work around a bug in snapd suspend logic
-              run: |
-                sudo mkdir -p /etc/systemd/system/snapd.service.d
-                (
-                  echo "[Service]"
-                  echo "Environment=SNAPD_STANDBY_WAIT=15m"
-                ) | sudo tee /etc/systemd/system/snapd.service.d/standby.conf
-                sudo systemctl daemon-reload
-                sudo systemctl restart snapd.service
-            - name: Install image-garden snap
-              run: |
-                export X_SPREAD_SNAP_CACHE_DIR="$(pwd)"/.image-garden/cache-host/snaps
-                ./bin/snap-install snapd
-                ./bin/snap-install core24
-                ./bin/snap-install --devmode image-garden "${{ inputs.image-garden-channel || 'latest/edge' }}"
-            - name: Use spread from image-garden snap
-              run: sudo snap alias image-garden.spread spread
-            - name: Restore mtime of .image-garden.mk
-              run: |
-                # Disable man page updates which is time-consuming.
-                echo "man-db man-db/auto-update boolean false" | sudo debconf-set-selections
-                # Download the deb and install it by hand.
-                wget http://ftp.us.debian.org/debian/pool/main/g/git-mestrelion-tools/git-restore-mtime_2022.12-1_all.deb
-                sudo dpkg -i git-restore-mtime_2022.12-1_all.deb
-                rm -f git-restore-mtime_2022.12-1_all.deb
-                # sudo apt update
-                # sudo apt install -y git-restore-mtime
-                git restore-mtime .image-garden.mk
-                ls -l .image-garden.mk
-            - name: Make the virtual machine image (dry run)
-              run: |
-                mkdir -p ~/snap/image-garden/common/cache/dl
-                ls -lR ~/snap/image-garden/common/cache/dl
-                ls -lR .image-garden
-                image-garden make --debug --dry-run ${{ matrix.system }}."$(uname -m)".qcow2
-            - name: Make the virtual machine image
-              run: |
-                image-garden make \
-                  ${{ matrix.system }}."$(uname -m)".qcow2 \
-                  ${{ matrix.system }}."$(uname -m)".run \
-                  ${{ matrix.system }}."$(uname -m)".user-data \
-                  ${{ matrix.system }}."$(uname -m)".meta-data \
-                  ${{ matrix.system }}."$(uname -m)".seed.iso
-            - name: Rebase the virtual machine image
-              run: |
-                # TODO: only run this if there was a cache hit.
-                image-garden rebase ${{ matrix.system }}."$(uname -m)".qcow2
             - name: Restore cache of downloaded snaps
               uses: actions/cache/restore@v4
               with:
                 path: .image-garden/cache-*/snaps
                 key: snaps
-            - name: Ensure snap cache exists
-              run: mkdir -p .image-garden/cache-"$(uname -m)"/snaps
-            - name: Show snap cache (before testing)
-              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
-            - name: Run integration tests
+            - name: Set environment variables for spread
               run: |
                 # Export variables that spread picks up from the host.
-                export X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}"
-                export X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}"
-                export X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}"
-                export X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}"
-                export X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}"
-                # Run integration tests.
-                spread -v garden:${{ matrix.system }}:
-            - name: Show snap cache (after testing)
-              if: always()
-              run: ls -lR .image-garden/cache-"$(uname -m)"/snaps
-            - name: Show logs
-              if: failure()
-              run: |
-                for f in .image-garden/*.log; do
-                    echo "********************************"
-                    echo "$f"
-                    echo "********************************"
-                    echo
-                    cat "$f"
-                    echo
-                    echo
-                done
+                echo X_SPREAD_SNAPD_RISK_LEVEL="${{ inputs.snapd-risk-level || 'beta' }}" >> $GITHUB_ENV
+                echo X_SPREAD_LXD_RISK_LEVEL="${{ inputs.lxd-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_MAAS_RISK_LEVEL="${{ inputs.maas-risk-level || 'candidate' }}" >> $GITHUB_ENV
+                echo X_SPREAD_SNAPCRAFT_RISK_LEVEL="${{ inputs.snapcraft-risk-level || 'stable' }}" >> $GITHUB_ENV
+                echo X_SPREAD_DOCKER_RISK_LEVEL="${{ inputs.docker-risk-level || 'stable' }}" >> $GITHUB_ENV
+            - name: Run integration tests
+              uses: zyga/image-garden-action@85a3d79c9d1e1628d7b0bad081b3a3463c2819a3
+              with:
+                garden-system: ${{ matrix.garden-system }}
+                cache-prepared-images: ${{ matrix.garden-system == 'archlinux-cloud' }}
