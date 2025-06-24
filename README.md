@@ -10,13 +10,13 @@ representative snaps.
 
 The following distributions are tested on x86\_64 hardware:
 
-- Amazon Linux (2023)
+- Amazon Linux (2 and 2023)
 - Arch Linux
 - CentOS (9 and 10)
 - Debian (11, 12 and sid)
 - Fedora (41 and 42)
 - Ubuntu (LTSes since 20.04, devel releases and upcoming release)
-- openSUSE (Tumbleweed)
+- openSUSE (Tumbleweed with AppArmor)
 
 If you are running on aarch64 hardware, you can run the same tests locally,
 except for Arch Linux, as there is no upstream cloud image for Arch yet.
