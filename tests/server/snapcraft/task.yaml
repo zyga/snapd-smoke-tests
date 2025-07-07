@@ -35,7 +35,9 @@ prepare: |
     # Install snapcraft for building a snap.
     snap-install --classic snapcraft latest/"${X_SPREAD_SNAPCRAFT_RISK_LEVEL}"
 restore: |
-    snap remove --purge test-snapd-smoke || true
+    snap remove --purge test-snapd-smoke
     snap remove --purge snapcraft
-    snap remove --purge lxd
+    for i in $(seq 5); do
+        snap remove --purge lxd && break
+    done
 summary: Install and see Snapcraft help output.

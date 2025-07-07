@@ -44,7 +44,9 @@ prepare: |
         ip6tables -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || true
     fi
 restore: |
-    snap run lxd.lxc stop u1 || true
-    snap run lxd.lxc delete u1 || true
-    snap remove --purge lxd
+    snap run lxd.lxc stop u1
+    snap run lxd.lxc delete u1
+    for i in $(seq 5); do
+        snap remove --purge lxd && break
+    done
 summary: Install and see LXD help output.
